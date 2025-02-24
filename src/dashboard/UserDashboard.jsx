@@ -1,9 +1,11 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
+import { getUserProfile } from "../api/user";
 
 const UserDashboard = () => {
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashOut: { receiver: "", amount: "" } });
+  const [profileData, setProfileData] = useState(null); // State for user profile
 
   const handleChange = (e, type) => {
     setFormData({
@@ -18,11 +20,27 @@ const UserDashboard = () => {
     setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
   };
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user?.user?.mobile) return; // Ensure user is available before making the request
+      try {
+        const profile = await getUserProfile(user.user.mobile);
+        // console.log("User Profile Data ", profile);
+        setProfileData(profile);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, [user]); // Dependency array includes `user` to refetch when it changes
+
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
-          <h2 className="text-base font-medium">Account Details</h2>
+          <h2 className="text-base font-medium">User Account Details</h2>
           <button
             onClick={logout}
             className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
@@ -37,12 +55,21 @@ const UserDashboard = () => {
               <tr key={index} className="border flex justify-between p-2">
                 <td className="font-semibold w-1/2 text-left">{label}:</td>
                 <td className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                  {label === "Total Balance" ? "$5000" : label === "Name" ? "John Doe" : label === "Mobile Number" ? "+1234567890" : label === "Email" ? "johndoe@example.com" : "123456789"}
-                </td>
-              </tr>
+                  {label === "Total Balance"
+                    ? `$${profileData?.balance || 0}`
+                    : label === "Name"
+                      ? profileData?.name || "N/A"
+                      : label === "Mobile Number"
+                        ? profileData?.mobile || "N/A"
+                        : label === "Email"
+                          ? profileData?.email || "N/A"
+                          : profileData?.nid || "N/A"}
+                    </td>
+                  </tr>
             ))}
           </tbody>
         </table>
+
       </div>
 
       {/* Transaction Forms */}
@@ -51,21 +78,21 @@ const UserDashboard = () => {
           <div key={type} className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
             <h2 className="text-sm font-semibold text-center">{type === "sendMoney" ? "Send Money" : "Cash Out"}</h2>
             <form className="mt-2 space-y-2" onSubmit={(e) => handleSubmit(e, type)}>
-              <input 
-                type="text" 
-                name="receiver" 
-                placeholder={type === "sendMoney" ? "Receiver Phone" : "Agent Phone"} 
-                value={formData[type].receiver} 
-                onChange={(e) => handleChange(e, type)} 
+              <input
+                type="text"
+                name="receiver"
+                placeholder={type === "sendMoney" ? "Receiver Phone" : "Agent Phone"}
+                value={formData[type].receiver}
+                onChange={(e) => handleChange(e, type)}
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
                 required
               />
-              <input 
-                type="number" 
-                name="amount" 
-                placeholder="Amount" 
-                value={formData[type].amount} 
-                onChange={(e) => handleChange(e, type)} 
+              <input
+                type="number"
+                name="amount"
+                placeholder="Amount"
+                value={formData[type].amount}
+                onChange={(e) => handleChange(e, type)}
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
                 required
               />
