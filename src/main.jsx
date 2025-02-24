@@ -13,7 +13,6 @@ import UserDashboard from './dashboard/UserDashboard';
 import AgentDashboard from './dashboard/AgentDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
 
-
 const router = createBrowserRouter([
   {
     path: "/",

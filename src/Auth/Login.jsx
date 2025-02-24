@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import * as jwt_decode from 'jwt-decode';
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
-    const navigate = useNavigate();
 
+    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const [inputs, setInputs] = useState({
         identifier: "", // Can be mobile number or email
         pin: "",
@@ -16,31 +17,7 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const { identifier, pin } = inputs;
-        console.log("inputs-login",inputs);
-
-        fetch(`${import.meta.env.VITE_ENDPOINT}/user/auth`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ identifier, pin }),
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log("login",data);
-                if (data.user.accountType=="User") {
-                    navigate(`/user`);
-                }
-                else if (data.user.accountType=='Agent'){
-                    navigate('/agent');
-                }else if(data.user.accountType=="Admin"){
-                    navigate('/admin');
-                }
-            })
-            .catch(error => {
-                console.error('Error during login:', error);
-            });
+        login(inputs)
     };
 
     return (
