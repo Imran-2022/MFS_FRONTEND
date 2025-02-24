@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
+import { cashOut } from "../api/transactions";
 
 const UserDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -10,7 +11,7 @@ const UserDashboard = () => {
   const handleChange = (e, type) => {
     setFormData({
       ...formData,
-      [type]: { ...formData[type], [e.target.name]: e.target.value }
+      [type]: { ...formData[type], [e.target.name]: e.target.value },
     });
   };
 
@@ -18,13 +19,32 @@ const UserDashboard = () => {
     e.preventDefault();
     console.log(`${type} transaction:`, formData[type]);
     setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
+
+    // handle send money and cash out logic. 
+
+    if(type="cashOut"){
+      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash Out",amount:Number(formData[type].amount)};
+      console.log(transactionData,"transactionData");
+      const handleCashOut = async () => {
+        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        try {
+          const profile = await cashOut(transactionData);
+          console.log("User Profile Data ", profile);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      handleCashOut();
+    }
+
   };
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
       try {
-        const profile = await getUserProfile(user.user.mobile);
+        const profile = await getUserProfile(user?.user?.mobile);
         // console.log("User Profile Data ", profile);
         setProfileData(profile);
       } catch (error) {
