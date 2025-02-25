@@ -120,7 +120,9 @@ const AgentDashboard = () => {
               </div>
             )}
 
-            <button disabled={profileData?.balanceRequest}
+            {
+              profileData?.approval==="verified" &&(
+                <button disabled={profileData?.balanceRequest}
               onClick={()=>handleRecharge(profileData?.balanceRequest)}
               className="px-3 py-1 text-xs rounded-md bg-purple-600 text-white font-medium hover:opacity-80 transition"
             >
@@ -129,6 +131,8 @@ const AgentDashboard = () => {
                 !profileData?.balanceRequest ?"Balance-Recharge Request":"Balance-Recharge Request pending"
               }
             </button>
+              )
+            }
 
             <Link
               to={`/agent/${user?.user?.mobile}`}

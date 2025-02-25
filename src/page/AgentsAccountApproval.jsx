@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { getAgentswithPending, updateAgentAccountStatus } from "../api/user";
 
 const AgentsAccountApproval = () => {
   const [agents, setAgents] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -16,31 +19,35 @@ const AgentsAccountApproval = () => {
     };
 
     fetchAgents();
-  }, []);
+  }, [refresh]);
 
   const handleAccept = async (mobile) => {
     console.log("Accept agent with ID:", mobile);
     try {
-        const approval = "verified";
-        const result = await updateAgentAccountStatus(mobile, approval);
-        console.log("Agent updated successfully:", result);
+      const approval = "verified";
+      const result = await updateAgentAccountStatus(mobile, approval);
+      console.log("Agent updated successfully:", result);
+      setRefresh(!refresh);
+      toast.success("Agent Account Verified!!");
     } catch (error) {
-        console.error("Failed to update agent:", error);
+      toast.error(error.response?.data?.error || "Something went wrong!");
     }
-};
+  };
 
-  const handleReject = async(mobile) => {
+  const handleReject = async (mobile) => {
     try {
-        const approval = "rejected";
-        const result = await updateAgentAccountStatus(mobile, approval);
-        console.log("Agent updated successfully:", result);
+      const approval = "rejected";
+      const result = await updateAgentAccountStatus(mobile, approval);
+      setRefresh(!refresh);
+      toast.success("Agent Account rejected!!");
     } catch (error) {
-        console.error("Failed to update agent:", error);
+      toast.error(error.response?.data?.error || "Something went wrong!");
     }
   };
 
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
+      <ToastContainer />
       {/* Header Section */}
       <div className="w-[70%] bg-white shadow-md px-4 py-5 rounded-t-lg flex justify-between items-center">
         <h2 className="text-sm font-semibold text-gray-700">ALL Agents Account Approval Request, Total Count: {agents?.length || "N/A"}</h2>
