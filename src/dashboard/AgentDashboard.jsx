@@ -3,13 +3,14 @@ import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AgentDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
-
   const [refresh, setRefresh] = useState(false);
 
   const handleChange = (e, type) => {
@@ -50,9 +51,11 @@ const AgentDashboard = () => {
         try {
           const res = await cashIn(transactionData);
           console.log("User Profile Data ", res);
+          toast.success("Cash In Success!!");
           setRefresh(!refresh);
         } catch (error) {
-          console.error("Error fetching profile:", error);
+          // console.error("Error:", error.response?.data || error.message);
+          toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
@@ -67,10 +70,10 @@ const AgentDashboard = () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
           const res = await sendMoney(transactionData);
-          console.log("User Profile Data ", res);
+          toast.success("Send Money Success!!");
           setRefresh(!refresh);
         } catch (error) {
-          console.error("Error fetching profile:", error);
+          toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
@@ -79,8 +82,21 @@ const AgentDashboard = () => {
 
   };
 
+
+  // handle balance recharge request to admin 
+
+  const handleRecharge=()=>{
+    if(profileData?.balanceRequest)toast.success("Balance Recharge Requested Pending .........!!");
+    else toast.success("Balance Recharge Requested!!");
+
+
+        
+
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <ToastContainer />
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">Agent Account Details</h2>
@@ -95,6 +111,16 @@ const AgentDashboard = () => {
                 ❌ Account Rejected
               </div>
             )}
+
+            <button disabled={profileData?.balanceRequest}
+              onClick={()=>handleRecharge()}
+              className="px-3 py-1 text-xs rounded-md bg-purple-600 text-white font-medium hover:opacity-80 transition"
+            >
+              
+              {
+                !profileData?.balanceRequest ?"Balance-Recharge Request":"Balance-Recharge Request pending"
+              }
+            </button>
 
             <Link
               to={`/agent/${user?.user?.mobile}`}

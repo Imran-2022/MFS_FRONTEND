@@ -23,10 +23,9 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user?.user?.mobile) return; // Ensure user is available before making the request
+      if (!user?.user?.mobile) return; // Ensure user is available
       try {
         const profile = await getUserProfile(user?.user?.mobile);
-        // console.log("User Profile Data ", profile);
         setProfileData(profile);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -34,27 +33,31 @@ const UserDashboard = () => {
     };
 
     fetchProfile();
-  }, [user, refresh]); // Dependency array includes `user` to refetch when it changes
+  }, [user, refresh]); //to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
-    console.log(`${type} transaction:`, formData[type]);
     setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
 
     // handle send money and cash out logic. 
 
     if (type == "cashOut") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash Out", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
+      const transactionData = {
+        sender: user?.user?.mobile,
+        receiver: formData[type].receiver, 
+        amount: Number(formData[type].amount),
+        type: "Cash Out"
+      };
+
       const handleCashOut = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        if (!user?.user?.mobile) return; // Ensure user is available
         try {
           const res = await cashOut(transactionData);
-          console.log("User Profile Data ", res);
+          // console.log("User Profile Data ", res);
           toast.success("Cash Out Success!!");
           setRefresh(!refresh);
         } catch (error) {
-          console.error("Error:", error.response?.data || error.message);
+          // console.error("Error:", error.response?.data || error.message);
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
@@ -67,7 +70,7 @@ const UserDashboard = () => {
 
       const transactionData = {
         sender: user?.user?.mobile,
-        receiver: formData[type].receiver,  // Ensure receiver is included
+        receiver: formData[type].receiver, 
         amount: Number(formData[type].amount),
         type: "Send Money"
       };
@@ -75,14 +78,14 @@ const UserDashboard = () => {
       console.log(transactionData, "clg");
 
       const handleCSendMoney = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        if (!user?.user?.mobile) return; // Ensure user is available
         try {
           const res = await sendMoney(transactionData);
-          console.log("User Profile Data ", res);
+          // console.log("User Profile Data ", res);
           toast.success("Send Money Success!!");
           setRefresh(!refresh);
         } catch (error) {
-          console.error("Error:", error.response?.data || error.message);
+          // console.error("Error:", error.response?.data || error.message);
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };

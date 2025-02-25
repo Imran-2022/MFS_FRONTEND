@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
-import { getAgentsBalance, getAgentswithPending, getUserProfile, getUsersBalance } from "../api/user";
+import { getAgentsBalance, getAgentswithPending, getAgentswithRechargeRequest, getUserProfile, getUsersBalance } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 import AccountTable from "../components/AccountTable";
@@ -81,12 +81,25 @@ const AdminDashboard = () => {
   // pending agent size, 
 
   const [agents, setAgents] = useState([]);
+  const [balanceRequest, setBalanceRequest] = useState([]);
 
   useEffect(() => {
     const fetchAgents = async () => {
       try {
         const res = await getAgentswithPending();
         setAgents(res);
+      } catch (error) {
+        console.error("Error fetching agents:", error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const res = await getAgentswithRechargeRequest();
+        setBalanceRequest(res);
       } catch (error) {
         console.error("Error fetching agents:", error);
       }
@@ -226,10 +239,10 @@ const AdminDashboard = () => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="p-1 text-left text-sm">Agent Withdraw Approval</td>
-                <td className="p-1 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-1 text-left text-sm">Agent Balance Recharge</td>
+                <td className="p-1 text-center text-blue-600 font-bold text-xs">{balanceRequest.length||"0"}</td>
                 <td className="p-1 text-right">
-                  <Link to="/manage/agents_withdraw">
+                  <Link to="/manage/agents_recharge">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
                     >
@@ -239,10 +252,10 @@ const AdminDashboard = () => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="p-1 text-left text-sm">Agent Balance Recharge</td>
+                <td className="p-1 text-left text-sm">Manage Users of the System</td>
                 <td className="p-1 text-center text-blue-600 font-bold text-xs">50</td>
                 <td className="p-1 text-right">
-                  <Link to="/manage/agents_recharge">
+                  <Link to="/manage/agents_withdraw">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
                     >

@@ -16,6 +16,13 @@ export const getAgentswithPending = async () => {
     return response.data;
 };
 
+//  Get Agents Balance Recharge
+
+export const getAgentswithRechargeRequest = async () => {
+    const response = await axios.get(`${API_URL}/user/agentsRescharge`);
+    return response.data;
+};
+
 //  update Aegnts account Status
 
 export const updateAgentAccountStatus = async (mobile, approval) => {
