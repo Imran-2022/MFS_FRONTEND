@@ -137,14 +137,13 @@ const AdminDashboard = () => {
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
           <tbody>
-            {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
+            {["Total Balance", "Name", "Mobile Number", "Email", "Nid"].map((label, index) => {
               const value = {
                 "Total Balance": `$${profileData?.balance || 0}`,
                 Name: profileData?.name || "N/A",
                 "Mobile Number": profileData?.mobile || "N/A",
                 Email: profileData?.email || "N/A",
                 Nid: profileData?.nid || "N/A",
-                Income: profileData?.income || "N/A",
               }[label];
 
               return (

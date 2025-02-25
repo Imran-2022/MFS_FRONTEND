@@ -10,7 +10,7 @@ const AgentDashboard = () => {
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
 
-  const [refresh,setRefresh]=useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const handleChange = (e, type) => {
     setFormData({
@@ -33,7 +33,7 @@ const AgentDashboard = () => {
     };
 
     fetchProfile();
-  }, [user,refresh]); // Dependency array includes `user` to refetch when it changes
+  }, [user, refresh]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -62,7 +62,7 @@ const AgentDashboard = () => {
 
     if (type == "sendMoney") {
       const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
+      // console.log(transactionData, "transactionData");
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -112,33 +112,31 @@ const AgentDashboard = () => {
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
-        <tbody>
-      {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
-        const value = {
-          "Total Balance": showBalance ? `$${profileData?.balance || 0}` : "************",
-          Name: profileData?.name || "N/A",
-          "Mobile Number": profileData?.mobile || "N/A",
-          Email: profileData?.email || "N/A",
-          Nid: profileData?.nid || "N/A",
-          Income: profileData?.income||"N/A",
-        }[label];
+          <tbody>
+            {["Total Balance", "Name", "Mobile Number", "Email", "Nid"].map((label, index) => {
+              const value = {
+                "Total Balance": showBalance ? `$${profileData?.balance || 0}` : "************",
+                Name: profileData?.name || "N/A",
+                "Mobile Number": profileData?.mobile || "N/A",
+                Email: profileData?.email || "N/A",
+                Nid: profileData?.nid || "N/A",
+              }[label];
 
-        return (
-          <tr key={index} className="border">
-            <td className="font-semibold text-left p-2">{label}:</td>
-            <td
-              className={`text-right p-2 ${["Total Balance", "Income"].includes(label) ? "text-green-600 font-bold cursor-pointer" : ""}`}
-              onClick={() => {
-                if (label === "Total Balance") setShowBalance(!showBalance);
-                if (label === "Income") setShowIncome(!showIncome);
-              }}
-            >
-              {value}
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
+              return (
+                <tr key={index} className="border">
+                  <td className="font-semibold text-left p-2">{label}:</td>
+                  <td
+                    className={`text-right p-2 ${["Total Balance"].includes(label) ? "text-green-600 font-bold cursor-pointer" : ""}`}
+                    onClick={() => {
+                      if (label === "Total Balance") setShowBalance(!showBalance);
+                    }}
+                  >
+                    {value}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
 
         </table>
 

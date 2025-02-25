@@ -3,12 +3,15 @@ import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
 import { cashOut, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashOut: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
+  const [refresh, setRefresh] = useState(false);
 
   const handleChange = (e, type) => {
     setFormData({
@@ -31,7 +34,7 @@ const UserDashboard = () => {
     };
 
     fetchProfile();
-  }, [user]); // Dependency array includes `user` to refetch when it changes
+  }, [user, refresh]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -48,8 +51,11 @@ const UserDashboard = () => {
         try {
           const res = await cashOut(transactionData);
           console.log("User Profile Data ", res);
+          toast.success("Cash Out Success!!");
+          setRefresh(!refresh);
         } catch (error) {
-          console.error("Error fetching profile:", error);
+          console.error("Error:", error.response?.data || error.message);
+          toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
@@ -58,18 +64,28 @@ const UserDashboard = () => {
 
 
     if (type == "sendMoney") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
+
+      const transactionData = {
+        sender: user?.user?.mobile,
+        receiver: formData[type].receiver,  // Ensure receiver is included
+        amount: Number(formData[type].amount),
+        type: "Send Money"
+      };
+
+      console.log(transactionData, "clg");
+
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
           const res = await sendMoney(transactionData);
           console.log("User Profile Data ", res);
+          toast.success("Send Money Success!!");
+          setRefresh(!refresh);
         } catch (error) {
-          console.error("Error fetching profile:", error);
+          console.error("Error:", error.response?.data || error.message);
+          toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
-
       handleCSendMoney();
     }
 
@@ -77,6 +93,7 @@ const UserDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <ToastContainer />
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">User Account Details</h2>
@@ -102,12 +119,12 @@ const UserDashboard = () => {
               <tr key={index} className="border flex justify-between p-2">
                 <td className="font-semibold w-1/2 text-left">{label}:</td>
                 <td
-              className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold cursor-pointer" : ""}`}
-              onClick={() => label === "Total Balance" && setShowBalance(!showBalance)}
-            >
-              {label === "Total Balance" ? (
-                showBalance ? `$${profileData?.balance || 0}` : "************"
-              )
+                  className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold cursor-pointer" : ""}`}
+                  onClick={() => label === "Total Balance" && setShowBalance(!showBalance)}
+                >
+                  {label === "Total Balance" ? (
+                    showBalance ? `$${profileData?.balance || 0}` : "************"
+                  )
                     : label === "Name"
                       ? profileData?.name || "N/A"
                       : label === "Mobile Number"
