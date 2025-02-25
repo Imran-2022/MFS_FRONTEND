@@ -29,3 +29,26 @@ export const updateAgentAccountStatus = async (mobile, approval) => {
         throw error;
     }
 };
+
+
+// Get total users balance
+export const getUsersBalance = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/user/get_users_balance`);
+        return response.data.userTotalBalance;
+    } catch (error) {
+        console.error("Error fetching user balance:", error);
+        return 0;
+    }
+};
+
+// Get total agent balance
+export const getAgentsBalance = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/user/get_agets_balance`);
+        return response.data.agentTotalBalance;
+    } catch (error) {
+        console.error("Error fetching agent balance:", error);
+        return 0;
+    }
+};

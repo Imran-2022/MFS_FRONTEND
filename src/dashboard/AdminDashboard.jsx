@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
-import { getAgentswithPending, getUserProfile } from "../api/user";
+import { getAgentsBalance, getAgentswithPending, getUserProfile, getUsersBalance } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
+import AccountTable from "../components/AccountTable";
 
 const AdminDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -80,19 +81,37 @@ const AdminDashboard = () => {
   // pending agent size, 
 
   const [agents, setAgents] = useState([]);
-  
-    useEffect(() => {
-      const fetchAgents = async () => {
-        try {
-          const res = await getAgentswithPending();
-          setAgents(res);
-        } catch (error) {
-          console.error("Error fetching agents:", error);
-        }
-      };
-  
-      fetchAgents();
-    }, []);
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const res = await getAgentswithPending();
+        setAgents(res);
+      } catch (error) {
+        console.error("Error fetching agents:", error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+
+  const [userTotalBalance, setUserTotalBalance] = useState(0);
+  const [agentTotalBalance, setAgentTotalBalance] = useState(0);
+
+  useEffect(() => {
+      async function fetchBalances() {
+          setUserTotalBalance(await getUsersBalance());
+          setAgentTotalBalance(await getAgentsBalance());
+      }
+      fetchBalances();
+  }, []);
+
+  const accounts = [
+    { name: "Total Admin Account Balance", balance: `${profileData?.balance || 0}` },
+    { name: "Total Users Account Balance", balance: userTotalBalance },
+    { name: "Total Agents Account Balance", balance: agentTotalBalance },
+  ];
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -113,6 +132,7 @@ const AdminDashboard = () => {
               Logout
             </button>
           </div>
+
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
@@ -140,6 +160,13 @@ const AdminDashboard = () => {
 
         </table>
 
+      </div>
+
+      {/* Total Balance of the Entire System */}
+
+      <div className="w-full max-w-4xl mt-4 rounded-xl shadow  p-4">
+        <h2 className="text-base font-medium">Total Balance in the System</h2>
+        <AccountTable accounts={accounts} />
       </div>
 
       {/* Transaction Forms */}
@@ -187,9 +214,9 @@ const AdminDashboard = () => {
             {/* Table Body */}
             <tbody>
               <tr className="border-b">
-                <td className="p-2 text-left text-sm">Agents Account Approval</td>
-                <td className="p-2 text-center text-blue-600 font-bold text-xs">{agents.length||"0"}</td>
-                <td className="p-2 text-right">
+                <td className="p-1 text-left text-sm">Agents Account Approval</td>
+                <td className="p-1 text-center text-blue-600 font-bold text-xs">{agents.length || "0"}</td>
+                <td className="p-1 text-right">
                   <Link to="/manage/agents_account">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
@@ -200,10 +227,10 @@ const AdminDashboard = () => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="p-2 text-left text-sm">Agent Withdraw Approval</td>
-                <td className="p-2 text-center text-blue-600 font-bold text-xs">50</td>
-                <td className="p-2 text-right">
-                <Link to="/manage/agents_withdraw">
+                <td className="p-1 text-left text-sm">Agent Withdraw Approval</td>
+                <td className="p-1 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-1 text-right">
+                  <Link to="/manage/agents_withdraw">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
                     >
@@ -213,10 +240,10 @@ const AdminDashboard = () => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="p-2 text-left text-sm">Agent Balance Recharge</td>
-                <td className="p-2 text-center text-blue-600 font-bold text-xs">50</td>
-                <td className="p-2 text-right">
-                <Link to="/manage/agents_recharge">
+                <td className="p-1 text-left text-sm">Agent Balance Recharge</td>
+                <td className="p-1 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-1 text-right">
+                  <Link to="/manage/agents_recharge">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
                     >
