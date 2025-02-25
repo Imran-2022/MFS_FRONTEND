@@ -5,6 +5,7 @@ import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 
 const AgentDashboard = () => {
+  const [showBalance, setShowBalance] = useState(false);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
@@ -98,27 +99,33 @@ const AgentDashboard = () => {
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
-          <tbody>
-            {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
-              const value = {
-                "Total Balance": `$${profileData?.balance || 0}`,
-                Name: profileData?.name || "N/A",
-                "Mobile Number": profileData?.mobile || "N/A",
-                Email: profileData?.email || "N/A",
-                Nid: profileData?.nid || "N/A",
-                Income: profileData?.income || "N/A",
-              }[label];
+        <tbody>
+      {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
+        const value = {
+          "Total Balance": showBalance ? `$${profileData?.balance || 0}` : "************",
+          Name: profileData?.name || "N/A",
+          "Mobile Number": profileData?.mobile || "N/A",
+          Email: profileData?.email || "N/A",
+          Nid: profileData?.nid || "N/A",
+          Income: profileData?.income||"N/A",
+        }[label];
 
-              return (
-                <tr key={index} className="border">
-                  <td className="font-semibold text-left p-2">{label}:</td>
-                  <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                    {value}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+        return (
+          <tr key={index} className="border">
+            <td className="font-semibold text-left p-2">{label}:</td>
+            <td
+              className={`text-right p-2 ${["Total Balance", "Income"].includes(label) ? "text-green-600 font-bold cursor-pointer" : ""}`}
+              onClick={() => {
+                if (label === "Total Balance") setShowBalance(!showBalance);
+                if (label === "Income") setShowIncome(!showIncome);
+              }}
+            >
+              {value}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
 
         </table>
 

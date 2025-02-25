@@ -5,6 +5,7 @@ import { cashOut, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
+  const [showBalance, setShowBalance] = useState(false);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashOut: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
@@ -100,9 +101,13 @@ const UserDashboard = () => {
             {["Total Balance", "Name", "Mobile Number", "Email", "NID"].map((label, index) => (
               <tr key={index} className="border flex justify-between p-2">
                 <td className="font-semibold w-1/2 text-left">{label}:</td>
-                <td className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                  {label === "Total Balance"
-                    ? `$${profileData?.balance || 0}`
+                <td
+              className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold cursor-pointer" : ""}`}
+              onClick={() => label === "Total Balance" && setShowBalance(!showBalance)}
+            >
+              {label === "Total Balance" ? (
+                showBalance ? `$${profileData?.balance || 0}` : "************"
+              )
                     : label === "Name"
                       ? profileData?.name || "N/A"
                       : label === "Mobile Number"
