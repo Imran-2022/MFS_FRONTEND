@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
-import { getUserProfile } from "../api/user";
+import { getAgentswithPending, getUserProfile } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
     };
 
     fetchProfile();
-  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -74,6 +74,25 @@ const AdminDashboard = () => {
 
   };
 
+
+
+
+  // pending agent size, 
+
+  const [agents, setAgents] = useState([]);
+  
+    useEffect(() => {
+      const fetchAgents = async () => {
+        try {
+          const res = await getAgentswithPending();
+          setAgents(res);
+        } catch (error) {
+          console.error("Error fetching agents:", error);
+        }
+      };
+  
+      fetchAgents();
+    }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -167,29 +186,48 @@ const AdminDashboard = () => {
             </thead>
             {/* Table Body */}
             <tbody>
-              {[
-                { task: "Agents Account Approval", pending: 30 },
-                { task: "Agent Withdraw Approval", pending: 50 },
-                { task: "Agent Balance Recharge", pending: 50 },
-              ].map((item, index) => (
-                <tr key={index} className="border-b">
-                  <td className="p-2 text-left text-sm">{item.task}</td>
-                  <td className="p-2 text-center text-blue-600 font-bold text-xs">{item.pending}</td>
-                  <td className="p-2 text-right">
+              <tr className="border-b">
+                <td className="p-2 text-left text-sm">Agents Account Approval</td>
+                <td className="p-2 text-center text-blue-600 font-bold text-xs">{agents.length||"0"}</td>
+                <td className="p-2 text-right">
+                  <Link to="/manage/agents_account">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
-                      onClick={() => handleNavigation(item.task)}
                     >
                       Manage
                     </button>
-                  </td>
-                </tr>
-              ))}
+                  </Link>
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-2 text-left text-sm">Agent Withdraw Approval</td>
+                <td className="p-2 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-2 text-right">
+                <Link to="/manage/agents_withdraw">
+                    <button
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
+                    >
+                      Manage
+                    </button>
+                  </Link>
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-2 text-left text-sm">Agent Balance Recharge</td>
+                <td className="p-2 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-2 text-right">
+                <Link to="/manage/agents_recharge">
+                    <button
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
+                    >
+                      Manage
+                    </button>
+                  </Link>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
-
-
       </div>
     </div>
   );

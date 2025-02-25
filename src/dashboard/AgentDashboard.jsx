@@ -5,10 +5,12 @@ import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 
 const AgentDashboard = () => {
-  const [showBalance, setShowBalance] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
+
+  const [refresh,setRefresh]=useState(false);
 
   const handleChange = (e, type) => {
     setFormData({
@@ -23,7 +25,7 @@ const AgentDashboard = () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
       try {
         const profile = await getUserProfile(user?.user?.mobile);
-        // console.log("User Profile Data ", profile);
+        console.log("User Profile Data ", profile);
         setProfileData(profile);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -31,7 +33,7 @@ const AgentDashboard = () => {
     };
 
     fetchProfile();
-  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user,refresh]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -48,6 +50,7 @@ const AgentDashboard = () => {
         try {
           const res = await cashIn(transactionData);
           console.log("User Profile Data ", res);
+          setRefresh(!refresh);
         } catch (error) {
           console.error("Error fetching profile:", error);
         }
@@ -65,6 +68,7 @@ const AgentDashboard = () => {
         try {
           const res = await sendMoney(transactionData);
           console.log("User Profile Data ", res);
+          setRefresh(!refresh);
         } catch (error) {
           console.error("Error fetching profile:", error);
         }
@@ -75,14 +79,23 @@ const AgentDashboard = () => {
 
   };
 
-
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
-          <h2 className="text-base font-medium">User Account Details</h2>
+          <h2 className="text-base font-medium">Agent Account Details</h2>
           <div className="flex gap-2">
+            {profileData?.approval === "pending" && (
+              <div className="bg-red-100 text-red-600 border border-red-400 px-3 py-1 rounded-md text-xs font-semibold text-center">
+                ❌ Not Verified
+              </div>
+            )}
+            {profileData?.approval === "rejected" && (
+              <div className="bg-red-100 text-red-600 border border-red-400 px-3 py-1 rounded-md text-xs font-semibold text-center">
+                ❌ Account Rejected
+              </div>
+            )}
+
             <Link
               to={`/agent/${user?.user?.mobile}`}
               className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white font-medium hover:opacity-80 transition"

@@ -43,7 +43,7 @@ const Register = () => {
                 if (data?.error) {
                     toast.error(data.error);
                 } else {
-                    toast.success("Check your mail for confirmation");
+                    toast.success("Registration Successful,please login");
                     setTimeout(() => navigate('/'), 6000);
                 }
             })

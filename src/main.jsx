@@ -15,6 +15,9 @@ import AdminDashboard from './dashboard/AdminDashboard';
 import UserTransactionPage from './page/UserTransactionPage';
 import AgentTransactionPage from './page/AgentTransactionPage';
 import AllTransactionPage from './page/AllTransactionPage';
+import AgentsAccountApproval from './page/AgentsAccountApproval';
+import AgentsWithdrawApproval from './page/AgentsWithdrawApproval';
+import AgentsBalanceRecharge from './page/AgentsBalanceRecharge';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +56,18 @@ const router = createBrowserRouter([
       {
         path: '/admin',
         element: <AdminDashboard/>
+      }, 
+      {
+        path: '/manage/agents_account',
+        element: <AgentsAccountApproval/>
+      }, 
+      {
+        path: '/manage/agents_withdraw',
+        element: <AgentsWithdrawApproval/>
+      }, 
+      {
+        path: '/manage/agents_recharge',
+        element: <AgentsBalanceRecharge/>
       }, 
     ]
   },

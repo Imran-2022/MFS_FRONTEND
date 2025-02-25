@@ -5,7 +5,7 @@ import { cashOut, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
-  const [showBalance, setShowBalance] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
   const { logout, user } = useContext(AuthContext);
   const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashOut: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
@@ -31,7 +31,7 @@ const UserDashboard = () => {
     };
 
     fetchProfile();
-  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
