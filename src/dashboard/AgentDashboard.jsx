@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
-import { getUserProfile } from "../api/user";
+import { getUserProfile, updateAgentAccountStatus } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
@@ -85,13 +85,21 @@ const AgentDashboard = () => {
 
   // handle balance recharge request to admin 
 
-  const handleRecharge=()=>{
-    if(profileData?.balanceRequest)toast.success("Balance Recharge Requested Pending .........!!");
-    else toast.success("Balance Recharge Requested!!");
-
-
-        
-
+  const handleRecharge=async(balanceRequest)=>{
+    if (!user?.user?.mobile) return; 
+    try {
+        if(!balanceRequest){
+          const approval = "balanceRequest";
+            const result = await updateAgentAccountStatus(user?.user?.mobile, approval);
+            setRefresh(!refresh)
+            toast.success("Balance Recharge Requested!!");
+        }
+        else{
+          toast.error("Balance Recharge Requested Pending .........!!");
+        }
+        } catch (error) {
+          toast.error(error.response?.data?.error || "Something went wrong!");
+      }
   }
 
   return (
@@ -113,7 +121,7 @@ const AgentDashboard = () => {
             )}
 
             <button disabled={profileData?.balanceRequest}
-              onClick={()=>handleRecharge()}
+              onClick={()=>handleRecharge(profileData?.balanceRequest)}
               className="px-3 py-1 text-xs rounded-md bg-purple-600 text-white font-medium hover:opacity-80 transition"
             >
               
