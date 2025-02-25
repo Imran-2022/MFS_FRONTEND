@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useContext } from "react";
 import { Link } from "react-router-dom";
 import { getAgentswithRechargeRequest, updateAgentAccountStatus } from "../api/user";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { cashIn } from "../api/transactions";
+import AuthContext from "../context/AuthContext";
 
 const AgentsAccountApproval = () => {
   const [agents, setAgents] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const {user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchAgents = async () => {
       try {
         const res = await getAgentswithRechargeRequest();
-        console.log("res", res)
+        // console.log("res", res)
         setAgents(res);
       } catch (error) {
         console.error("Error fetching agents:", error);
@@ -24,16 +26,18 @@ const AgentsAccountApproval = () => {
   }, [refresh]);
 
   const handleAccept = async (mobile) => {
-    console.log("Accept agent with ID:", mobile);
-    const transactionData = {
-      balanceRequest: true,
-      sender: "01771207845",// admin
-      receiver: mobile,
-      amount: 100000,
-      type: "Cash In"
-    };
+   
 
     const handlecashIn = async () => {
+      if (!user?.user?.mobile) return;
+      const transactionData = {
+        balanceRequest: true,
+        sender: user?.user?.mobile,// admin
+        receiver: mobile,
+        amount: 100000,
+        type: "Cash In"
+      };
+
       try {
         const res = await cashIn(transactionData);
         console.log("User Profile Data ", res);
@@ -61,7 +65,7 @@ const AgentsAccountApproval = () => {
     }
   };
 
-  console.log(agents, "agents")
+  // console.log(agents, "agents")
 
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
