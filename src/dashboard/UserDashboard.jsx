@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
 import { cashOut, sendMoney } from "../api/transactions";
+import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const UserDashboard = () => {
     });
   };
 
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -29,7 +30,7 @@ const UserDashboard = () => {
     };
 
     fetchProfile();
-  }, [user,formData,profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -38,9 +39,9 @@ const UserDashboard = () => {
 
     // handle send money and cash out logic. 
 
-    if(type=="cashOut"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash Out",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "cashOut") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash Out", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handleCashOut = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -50,14 +51,14 @@ const UserDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handleCashOut();
     }
 
 
-    if(type=="sendMoney"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Send Money",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "sendMoney") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -67,25 +68,31 @@ const UserDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handleCSendMoney();
     }
 
   };
-
-
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">User Account Details</h2>
-          <button
-            onClick={logout}
-            className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
-          >
-            Logout
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to={`/user/${user?.user?.mobile}`}
+              className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Transaction History
+            </Link>
+            <button
+              onClick={logout}
+              className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
@@ -103,8 +110,8 @@ const UserDashboard = () => {
                         : label === "Email"
                           ? profileData?.email || "N/A"
                           : profileData?.nid || "N/A"}
-                    </td>
-                  </tr>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>

@@ -19,3 +19,16 @@ export const cashIn = async (transactionData) => {
     const response = await axios.post(`${API_URL}/transaction`, transactionData);
     return response.data;
 };
+
+// Get User Transactions
+export const getUserTransactions = async (mobile) => {
+    const response = await axios.get(`${API_URL}/transaction/${mobile}`);
+    return response.data;
+};
+
+
+// Get All Transactions
+export const getAllTransactions = async () => {
+    const response = await axios.get(`${API_URL}/transaction/`);
+    return response.data;
+};

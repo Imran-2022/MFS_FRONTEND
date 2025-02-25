@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
     });
   };
 
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -29,7 +30,7 @@ const AdminDashboard = () => {
     };
 
     fetchProfile();
-  }, [user,formData,profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -38,9 +39,9 @@ const AdminDashboard = () => {
 
     // handle send money and cash out logic. 
 
-    if(type=="cashIn"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash In",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "cashIn") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash In", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handlecashIn = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -50,14 +51,14 @@ const AdminDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handlecashIn();
     }
 
 
-    if(type=="sendMoney"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Send Money",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "sendMoney") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -67,12 +68,11 @@ const AdminDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handleCSendMoney();
     }
 
   };
-
 
 
   return (
@@ -80,36 +80,44 @@ const AdminDashboard = () => {
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">Admin Account Details</h2>
-          <button
-            onClick={logout}
-            className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
-          >
-            Logout
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to={`/admin/${user?.user?.mobile}`}
+              className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Transaction History
+            </Link>
+            <button
+              onClick={logout}
+              className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
-        <tbody>
-          {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
-            const value = {
-              "Total Balance": `$${profileData?.balance || 0}`,
-              Name: profileData?.name || "N/A",
-              "Mobile Number": profileData?.mobile || "N/A",
-              Email: profileData?.email || "N/A",
-              Nid: profileData?.nid || "N/A",
-              Income: profileData?.income || "N/A",
-            }[label];
+          <tbody>
+            {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
+              const value = {
+                "Total Balance": `$${profileData?.balance || 0}`,
+                Name: profileData?.name || "N/A",
+                "Mobile Number": profileData?.mobile || "N/A",
+                Email: profileData?.email || "N/A",
+                Nid: profileData?.nid || "N/A",
+                Income: profileData?.income || "N/A",
+              }[label];
 
-            return (
-              <tr key={index} className="border">
-                <td className="font-semibold text-left p-2">{label}:</td>
-                <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                  {value}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
+              return (
+                <tr key={index} className="border">
+                  <td className="font-semibold text-left p-2">{label}:</td>
+                  <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
+                    {value}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
 
         </table>
 
@@ -146,40 +154,40 @@ const AdminDashboard = () => {
           </div>
         ))}
 
-      <div className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
-        <h2 className="text-sm font-semibold text-center mb-2">Handle Admin Task</h2>
-        <table className="w-full border-collapse">
-          {/* Table Header */}
-          <thead>
-            <tr className="bg-gray-100 text-sm">
-              <th className="p-2 text-left font-semibold">Task</th>
-              <th className="p-2 text-center font-semibold">Pending</th>
-              <th className="p-2 text-right font-semibold">Action</th>
-            </tr>
-          </thead>
-          {/* Table Body */}
-          <tbody>
-            {[
-              { task: "Agents Account Approval", pending: 30 },
-              { task: "Agent Withdraw Approval", pending: 50 },
-              { task: "Agent Balance Recharge", pending: 50 },
-            ].map((item, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-2 text-left text-sm">{item.task}</td>
-                <td className="p-2 text-center text-blue-600 font-bold text-xs">{item.pending}</td>
-                <td className="p-2 text-right">
-                  <button
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
-                    onClick={() => handleNavigation(item.task)}
-                  >
-                    Manage
-                  </button>
-                </td>
+        <div className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
+          <h2 className="text-sm font-semibold text-center mb-2">Handle Admin Task</h2>
+          <table className="w-full border-collapse">
+            {/* Table Header */}
+            <thead>
+              <tr className="bg-gray-100 text-sm">
+                <th className="p-2 text-left font-semibold">Task</th>
+                <th className="p-2 text-center font-semibold">Pending</th>
+                <th className="p-2 text-right font-semibold">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            {/* Table Body */}
+            <tbody>
+              {[
+                { task: "Agents Account Approval", pending: 30 },
+                { task: "Agent Withdraw Approval", pending: 50 },
+                { task: "Agent Balance Recharge", pending: 50 },
+              ].map((item, index) => (
+                <tr key={index} className="border-b">
+                  <td className="p-2 text-left text-sm">{item.task}</td>
+                  <td className="p-2 text-center text-blue-600 font-bold text-xs">{item.pending}</td>
+                  <td className="p-2 text-right">
+                    <button
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
+                      onClick={() => handleNavigation(item.task)}
+                    >
+                      Manage
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
 
       </div>

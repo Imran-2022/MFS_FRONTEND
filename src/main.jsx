@@ -12,6 +12,9 @@ import Register from './Auth/Register';
 import UserDashboard from './dashboard/UserDashboard';
 import AgentDashboard from './dashboard/AgentDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
+import UserTransactionPage from './page/UserTransactionPage';
+import AgentTransactionPage from './page/AgentTransactionPage';
+import AllTransactionPage from './page/AllTransactionPage';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +33,18 @@ const router = createBrowserRouter([
       {
         path: '/user',
         element: <UserDashboard/>
+      }, 
+      {
+        path: '/user/:mobile',
+        element: <UserTransactionPage/>
+      }, 
+      {
+        path: '/agent/:mobile',
+        element: <AgentTransactionPage/>
+      }, 
+      {
+        path: '/admin/:mobile',
+        element: <AllTransactionPage/>
       }, 
       {
         path: '/agent',

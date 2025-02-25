@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
+import { Link } from "react-router-dom";
 
 const AgentDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const AgentDashboard = () => {
     });
   };
 
-  
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -29,7 +30,7 @@ const AgentDashboard = () => {
     };
 
     fetchProfile();
-  }, [user,formData,profileData]); // Dependency array includes `user` to refetch when it changes
+  }, [user, formData, profileData]); // Dependency array includes `user` to refetch when it changes
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
@@ -38,9 +39,9 @@ const AgentDashboard = () => {
 
     // handle send money and cash out logic. 
 
-    if(type=="cashIn"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash In",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "cashIn") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash In", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handlecashIn = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -50,14 +51,14 @@ const AgentDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handlecashIn();
     }
 
 
-    if(type=="sendMoney"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Send Money",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
+    if (type == "sendMoney") {
+      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
+      console.log(transactionData, "transactionData");
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
@@ -67,7 +68,7 @@ const AgentDashboard = () => {
           console.error("Error fetching profile:", error);
         }
       };
-  
+
       handleCSendMoney();
     }
 
@@ -80,36 +81,44 @@ const AgentDashboard = () => {
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">User Account Details</h2>
-          <button
-            onClick={logout}
-            className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
-          >
-            Logout
-          </button>
+          <div className="flex gap-2">
+            <Link
+              to={`/agent/${user?.user?.mobile}`}
+              className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Transaction History
+            </Link>
+            <button
+              onClick={logout}
+              className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
-        <tbody>
-          {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
-            const value = {
-              "Total Balance": `$${profileData?.balance || 0}`,
-              Name: profileData?.name || "N/A",
-              "Mobile Number": profileData?.mobile || "N/A",
-              Email: profileData?.email || "N/A",
-              Nid: profileData?.nid || "N/A",
-              Income: profileData?.income || "N/A",
-            }[label];
+          <tbody>
+            {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
+              const value = {
+                "Total Balance": `$${profileData?.balance || 0}`,
+                Name: profileData?.name || "N/A",
+                "Mobile Number": profileData?.mobile || "N/A",
+                Email: profileData?.email || "N/A",
+                Nid: profileData?.nid || "N/A",
+                Income: profileData?.income || "N/A",
+              }[label];
 
-            return (
-              <tr key={index} className="border">
-                <td className="font-semibold text-left p-2">{label}:</td>
-                <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                  {value}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
+              return (
+                <tr key={index} className="border">
+                  <td className="font-semibold text-left p-2">{label}:</td>
+                  <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
+                    {value}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
 
         </table>
 
