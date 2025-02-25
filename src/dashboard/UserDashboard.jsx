@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
-import { cashOut } from "../api/transactions";
+import { cashOut, sendMoney } from "../api/transactions";
 
 const UserDashboard = () => {
   const { logout, user } = useContext(AuthContext);
@@ -15,31 +15,7 @@ const UserDashboard = () => {
     });
   };
 
-  const handleSubmit = (e, type) => {
-    e.preventDefault();
-    console.log(`${type} transaction:`, formData[type]);
-    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
-
-    // handle send money and cash out logic. 
-
-    if(type="cashOut"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash Out",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
-      const handleCashOut = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
-        try {
-          const profile = await cashOut(transactionData);
-          console.log("User Profile Data ", profile);
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        }
-      };
   
-      handleCashOut();
-    }
-
-  };
-
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -53,7 +29,50 @@ const UserDashboard = () => {
     };
 
     fetchProfile();
-  }, [user]); // Dependency array includes `user` to refetch when it changes
+  }, [user,formData,profileData]); // Dependency array includes `user` to refetch when it changes
+
+  const handleSubmit = (e, type) => {
+    e.preventDefault();
+    console.log(`${type} transaction:`, formData[type]);
+    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
+
+    // handle send money and cash out logic. 
+
+    if(type=="cashOut"){
+      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash Out",amount:Number(formData[type].amount)};
+      console.log(transactionData,"transactionData");
+      const handleCashOut = async () => {
+        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        try {
+          const res = await cashOut(transactionData);
+          console.log("User Profile Data ", res);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      handleCashOut();
+    }
+
+
+    if(type=="sendMoney"){
+      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Send Money",amount:Number(formData[type].amount)};
+      console.log(transactionData,"transactionData");
+      const handleCSendMoney = async () => {
+        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        try {
+          const res = await sendMoney(transactionData);
+          console.log("User Profile Data ", res);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      handleCSendMoney();
+    }
+
+  };
+
 
 
   return (

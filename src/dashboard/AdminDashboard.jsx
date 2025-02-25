@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getUserProfile } from "../api/user";
-import { cashOut } from "../api/transactions";
+import { cashIn, sendMoney } from "../api/transactions";
 
 const AdminDashboard = () => {
   const { logout, user } = useContext(AuthContext);
-  const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashOut: { receiver: "", amount: "" } });
+  const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
 
   const handleChange = (e, type) => {
@@ -15,31 +15,7 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleSubmit = (e, type) => {
-    e.preventDefault();
-    console.log(`${type} transaction:`, formData[type]);
-    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
-
-    // handle send money and cash out logic. 
-
-    if(type="cashOut"){
-      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash Out",amount:Number(formData[type].amount)};
-      console.log(transactionData,"transactionData");
-      const handleCashOut = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
-        try {
-          const profile = await cashOut(transactionData);
-          console.log("User Profile Data ", profile);
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        }
-      };
   
-      handleCashOut();
-    }
-
-  };
-
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -53,14 +29,57 @@ const AdminDashboard = () => {
     };
 
     fetchProfile();
-  }, [user]); // Dependency array includes `user` to refetch when it changes
+  }, [user,formData,profileData]); // Dependency array includes `user` to refetch when it changes
+
+  const handleSubmit = (e, type) => {
+    e.preventDefault();
+    console.log(`${type} transaction:`, formData[type]);
+    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
+
+    // handle send money and cash out logic. 
+
+    if(type=="cashIn"){
+      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Cash In",amount:Number(formData[type].amount)};
+      console.log(transactionData,"transactionData");
+      const handlecashIn = async () => {
+        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        try {
+          const res = await cashIn(transactionData);
+          console.log("User Profile Data ", res);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      handlecashIn();
+    }
+
+
+    if(type=="sendMoney"){
+      const transactionData= {sender:user?.user?.mobile,...formData[type],type:"Send Money",amount:Number(formData[type].amount)};
+      console.log(transactionData,"transactionData");
+      const handleCSendMoney = async () => {
+        if (!user?.user?.mobile) return; // Ensure user is available before making the request
+        try {
+          const res = await sendMoney(transactionData);
+          console.log("User Profile Data ", res);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      handleCSendMoney();
+    }
+
+  };
+
 
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl p-4 rounded-xl shadow text-gray-900 bg-white border">
         <div className="flex justify-between items-center w-full mb-3">
-          <h2 className="text-base font-medium">User Account Details</h2>
+          <h2 className="text-base font-medium">Admin Account Details</h2>
           <button
             onClick={logout}
             className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
@@ -70,38 +89,42 @@ const AdminDashboard = () => {
         </div>
 
         <table className="w-full text-xs border-collapse border border-gray-300 rounded-xl overflow-hidden">
-          <tbody>
-            {["Total Balance", "Name", "Mobile Number", "Email", "NID"].map((label, index) => (
-              <tr key={index} className="border flex justify-between p-2">
-                <td className="font-semibold w-1/2 text-left">{label}:</td>
-                <td className={`w-1/2 text-right ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
-                  {label === "Total Balance"
-                    ? `$${profileData?.balance || 0}`
-                    : label === "Name"
-                      ? profileData?.name || "N/A"
-                      : label === "Mobile Number"
-                        ? profileData?.mobile || "N/A"
-                        : label === "Email"
-                          ? profileData?.email || "N/A"
-                          : profileData?.nid || "N/A"}
-                    </td>
-                  </tr>
-            ))}
-          </tbody>
+        <tbody>
+          {["Total Balance", "Name", "Mobile Number", "Email", "Nid", "Income"].map((label, index) => {
+            const value = {
+              "Total Balance": `$${profileData?.balance || 0}`,
+              Name: profileData?.name || "N/A",
+              "Mobile Number": profileData?.mobile || "N/A",
+              Email: profileData?.email || "N/A",
+              Nid: profileData?.nid || "N/A",
+              Income: profileData?.income || "N/A",
+            }[label];
+
+            return (
+              <tr key={index} className="border">
+                <td className="font-semibold text-left p-2">{label}:</td>
+                <td className={`text-right p-2 ${label === "Total Balance" ? "text-green-600 font-bold" : ""}`}>
+                  {value}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+
         </table>
 
       </div>
 
       {/* Transaction Forms */}
       <div className="w-full max-w-4xl mt-4 flex gap-4">
-        {["sendMoney", "cashOut"].map((type, index) => (
+        {["sendMoney"].map((type, index) => (
           <div key={type} className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
-            <h2 className="text-sm font-semibold text-center">{type === "sendMoney" ? "Send Money" : "Cash Out"}</h2>
+            <h2 className="text-sm font-semibold text-center">{type === "sendMoney" ? "Send Money" : "Cash In"}</h2>
             <form className="mt-2 space-y-2" onSubmit={(e) => handleSubmit(e, type)}>
               <input
                 type="text"
                 name="receiver"
-                placeholder={type === "sendMoney" ? "Receiver Phone" : "Agent Phone"}
+                placeholder="Receiver Phone"
                 value={formData[type].receiver}
                 onChange={(e) => handleChange(e, type)}
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
@@ -117,11 +140,48 @@ const AdminDashboard = () => {
                 required
               />
               <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
-                {type === "sendMoney" ? "Send Money" : "Cash Out"}
+                {type === "sendMoney" ? "Send Money" : "Cash In"}
               </button>
             </form>
           </div>
         ))}
+
+      <div className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
+        <h2 className="text-sm font-semibold text-center mb-2">Handle Admin Task</h2>
+        <table className="w-full border-collapse">
+          {/* Table Header */}
+          <thead>
+            <tr className="bg-gray-100 text-sm">
+              <th className="p-2 text-left font-semibold">Task</th>
+              <th className="p-2 text-center font-semibold">Pending</th>
+              <th className="p-2 text-right font-semibold">Action</th>
+            </tr>
+          </thead>
+          {/* Table Body */}
+          <tbody>
+            {[
+              { task: "Agents Account Approval", pending: 30 },
+              { task: "Agent Withdraw Approval", pending: 50 },
+              { task: "Agent Balance Recharge", pending: 50 },
+            ].map((item, index) => (
+              <tr key={index} className="border-b">
+                <td className="p-2 text-left text-sm">{item.task}</td>
+                <td className="p-2 text-center text-blue-600 font-bold text-xs">{item.pending}</td>
+                <td className="p-2 text-right">
+                  <button
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
+                    onClick={() => handleNavigation(item.task)}
+                  >
+                    Manage
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
       </div>
     </div>
   );
