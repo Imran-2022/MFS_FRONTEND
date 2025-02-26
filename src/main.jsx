@@ -14,10 +14,10 @@ import AgentDashboard from './dashboard/AgentDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
 import UserTransactionPage from './page/UserTransactionPage';
 import AgentTransactionPage from './page/AgentTransactionPage';
-import AllTransactionPage from './page/AllTransactionPage';
 import AgentsAccountApproval from './page/AgentsAccountApproval';
 import AgentsBalanceRecharge from './page/AgentsBalanceRecharge';
 import ManageUsers from './page/ManageUsers';
+import AdminTransactionPage from './page/AdminTransactionPage';
 
 const router = createBrowserRouter([
   {
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
       }, 
       {
         path: '/admin/:mobile',
-        element: <AllTransactionPage/>
+        element: <AdminTransactionPage/>
       }, 
       {
         path: '/agent',

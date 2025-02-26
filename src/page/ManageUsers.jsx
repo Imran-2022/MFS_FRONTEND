@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllUsers, updateAgentAccountStatus } from "../api/user";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from "../context/AuthContext";
 
 const ManageUsers = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const { user } = useContext(AuthContext);
@@ -52,6 +53,9 @@ const ManageUsers = () => {
       }
     };
 
+    const handleTransactionView=async(type,mobile)=>{
+      navigate(`/${type.toLowerCase()}/${mobile}`);
+    }
 
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
@@ -87,7 +91,7 @@ const ManageUsers = () => {
                 <tr key={user._id} className="border-b hover:bg-gray-100">
                   <td className="py-2 px-2">{user.accountType}</td>
                   <td className="py-2 px-2 flex space-x-2">
-                    <button
+                    <button onClick={()=>handleTransactionView(user.accountType,user.mobile)}
                       className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
                     >
                       Transactions

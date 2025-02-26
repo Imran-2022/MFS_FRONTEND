@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getAllTransactions } from "../api/transactions";
+import {getUserTransactions } from "../api/transactions";
+import AuthContext from "../context/AuthContext";
 
-const AllTransactionPage = () => {
+const AdminTransactionPage = () => {
   const [transactions, setTransactions] = useState([]);
   const { mobile } = useParams();
-
+  const {user } = useContext(AuthContext);
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!mobile) return;
       try {
-        const res = await getAllTransactions();
+        const res = await getUserTransactions(mobile);
         setTransactions(res);
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -69,4 +70,4 @@ const AllTransactionPage = () => {
   );
 };
 
-export default AllTransactionPage;
+export default AdminTransactionPage;

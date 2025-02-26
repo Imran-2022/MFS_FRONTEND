@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getUserTransactions } from "../api/transactions";
+import AuthContext from "../context/AuthContext";
 
 const UserTransactionPage = () => {
   const [transactions, setTransactions] = useState([]);
   const { mobile } = useParams();
-
+  const { user } = useContext(AuthContext);
   useEffect(() => {
     const fetchTransactions = async () => {
       if (!mobile) return;
       try {
         const res = await getUserTransactions(mobile);
-        setTransactions(res);
+        // setTransactions(res);
+       if(user?.user?.accountType=="Admin") setTransactions(res);
+       else  setTransactions(res.slice(0, 100));
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -24,12 +27,18 @@ const UserTransactionPage = () => {
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
       {/* Header Section */}
       <div className="w-[70%] bg-white shadow-md px-4 py-5 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-sm font-semibold text-gray-700">Transaction Details for {mobile}, total Count: {transactions?.length ||"N/A"}</h2>
-        <Link to="/user">
-          <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
-            Back to Account
-          </button>
-        </Link>
+        <h2 className="text-sm font-semibold text-gray-700">Transaction Details for {mobile}, total Count: {transactions?.length || "N/A"}</h2>
+        {
+          user?.user?.accountType == "Admin" ? <Link to="/manage/manage_user">
+            <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
+              Back to Admin/Management
+            </button>
+          </Link> : <Link to="/user">
+            <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
+              Back to Account
+            </button>
+          </Link>
+        }
       </div>
 
       {/* Transactions Table */}
