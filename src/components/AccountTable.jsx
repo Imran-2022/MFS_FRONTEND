@@ -11,7 +11,7 @@ export default function AccountTable({ accounts }) {
             </tr>
           ))}
           <tr className="border">
-            <td className="font-semibold text-left p-2">Total Balance:</td>
+            <td className="font-bold text-left  p-2">Total Balance in the System :</td>
             <td className="text-right p-2 text-green-600 font-bold">{`$${totalBalance}`}</td>
           </tr>
         </tbody>
