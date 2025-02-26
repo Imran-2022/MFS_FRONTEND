@@ -16,8 +16,20 @@ export const sendMoney = async (transactionData) => {
 // cash-In 
 
 export const cashIn = async (transactionData) => {
-    const response = await axios.post(`${API_URL}/transaction`, transactionData);
-    return response.data;
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+
+    try {
+        const response = await axios.post(`${API_URL}/transaction`, transactionData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error in cash-in transaction:", error);
+        throw error;
+    }
 };
 
 // Get User Transactions

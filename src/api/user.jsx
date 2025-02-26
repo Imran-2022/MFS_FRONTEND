@@ -12,15 +12,39 @@ export const getUserProfile = async (mobile) => {
 //  Get Agents account pending 
 
 export const getAgentswithPending = async () => {
-    const response = await axios.get(`${API_URL}/user/agentspending`);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const token = storedUser?.token;
+
+  try {
+    const response = await axios.get(`${API_URL}/user/agentspending`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
+  } catch (error) {
+    console.error("Error fetching agents with pending status:", error);
+    throw error;
+  }
 };
 
 //  Get Agents Balance Recharge
 
 export const getAgentswithRechargeRequest = async () => {
-    const response = await axios.get(`${API_URL}/user/agentsRescharge`);
-    return response.data;
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+  
+    try {
+      const response = await axios.get(`${API_URL}/user/agentsRescharge`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching agents with recharge requests:", error);
+      throw error;
+    }
 };
 //  Get All users
 
@@ -38,15 +62,24 @@ export const getCountOfUsers = async () => {
 //  update Aegnts account Status
 
 export const updateAgentAccountStatus = async (mobile, approval) => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const token = storedUser?.token;
+    // console.log("token",token);
     try {
-        const response = await axios.patch(`${API_URL}/user/${mobile}`, {
-            approval: approval,
-        });
+        const response = await axios.patch(
+          `${API_URL}/user/${mobile}`,
+          { approval },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         return response.data;
-    } catch (error) {
+      } catch (error) {
         console.error("Error updating agent account status:", error);
         throw error;
-    }
+      }
 };
 
 
