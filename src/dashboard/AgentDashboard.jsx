@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const AgentDashboard = () => {
   const [showBalance, setShowBalance] = useState(false);
   const { logout, user } = useContext(AuthContext);
-  const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "" }, cashIn: { receiver: "", amount: "" } });
+  const [formData, setFormData] = useState({ sendMoney: { receiver: "", amount: "",pin:"" }, cashIn: { receiver: "", amount: "",pin:"" } });
   const [profileData, setProfileData] = useState(null); // State for user profile
   const [refresh, setRefresh] = useState(false);
 
@@ -39,18 +39,23 @@ const AgentDashboard = () => {
   const handleSubmit = (e, type) => {
     e.preventDefault();
     console.log(`${type} transaction:`, formData[type]);
-    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
+    setFormData({ ...formData, [type]: { receiver: "", amount: "",pin:"" } });
 
     // handle send money and cash out logic. 
 
     if (type == "cashIn") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash In", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
+      const transactionData = {
+        sender: user?.user?.mobile,
+        receiver: formData[type].receiver, 
+        amount: Number(formData[type].amount),
+        pin : formData[type].pin,
+        type: "Cash In"
+      };
       const handlecashIn = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
           const res = await cashIn(transactionData);
-          console.log("User Profile Data ", res);
+          // console.log("User Profile Data ", res);
           toast.success("Cash In Success!!");
           setRefresh(!refresh);
         } catch (error) {
@@ -64,7 +69,15 @@ const AgentDashboard = () => {
 
 
     if (type == "sendMoney") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
+
+      const transactionData = {
+        sender: user?.user?.mobile,
+        receiver: formData[type].receiver, 
+        amount: Number(formData[type].amount),
+        pin : formData[type].pin,
+        type: "Send Money"
+      };
+
       // console.log(transactionData, "transactionData");
       const handleCSendMoney = async () => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
@@ -200,6 +213,15 @@ const AgentDashboard = () => {
                 name="amount"
                 placeholder="Amount"
                 value={formData[type].amount}
+                onChange={(e) => handleChange(e, type)}
+                className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
+                required
+              />
+              <input
+                type="password"
+                name="pin"
+                placeholder="pin"
+                value={formData[type].pin}
                 onChange={(e) => handleChange(e, type)}
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
                 required
