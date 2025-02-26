@@ -10,6 +10,8 @@ const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const { user } = useContext(AuthContext);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchusers = async () => {
@@ -30,39 +32,69 @@ const ManageUsers = () => {
 
   // handle user - block and active status 
 
-    const handleBlock= async (mobile) => {
-      try {
-        const approval = "block";
-        const result = await updateAgentAccountStatus(mobile, approval);
-        // console.log("user updated successfully:", result);
-        setRefresh(!refresh);
-        toast.success("Account Blocked!!");
-      } catch (error) {
-        toast.error(error.response?.data?.error || "Something went wrong!");
-      }
-    };
-  
-    const handleUnBlock = async (mobile) => {
-      try {
-        const approval = "unblock";
-        const result = await updateAgentAccountStatus(mobile, approval);
-        setRefresh(!refresh);
-        toast.success("Account UnBlocked!!");
-      } catch (error) {
-        toast.error(error.response?.data?.error || "Something went wrong!");
-      }
-    };
-
-    const handleTransactionView=async(type,mobile)=>{
-      navigate(`/${type.toLowerCase()}/${mobile}`);
+  const handleBlock = async (mobile) => {
+    try {
+      const approval = "block";
+      const result = await updateAgentAccountStatus(mobile, approval);
+      // console.log("user updated successfully:", result);
+      setRefresh(!refresh);
+      toast.success("Account Blocked!!");
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Something went wrong!");
     }
+  };
+
+  const handleUnBlock = async (mobile) => {
+    try {
+      const approval = "unblock";
+      const result = await updateAgentAccountStatus(mobile, approval);
+      setRefresh(!refresh);
+      toast.success("Account UnBlocked!!");
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Something went wrong!");
+    }
+  };
+
+  const handleTransactionView = async (type, mobile) => {
+    navigate(`/${type.toLowerCase()}/${mobile}`);
+  }
+  // Debounced Search Effect
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      if (searchTerm.trim() === "") {
+        setFilteredUsers(users);
+      } else {
+        const filtered = users.filter(user =>
+          user.mobile.includes(searchTerm.trim())
+        );
+        setFilteredUsers(filtered);
+      }
+    }, 500); // 500ms debounce time
+
+    return () => clearTimeout(delaySearch);
+  }, [searchTerm, users]);
+
 
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
       <ToastContainer />
       {/* Header Section */}
-      <div className="w-[70%] bg-white shadow-md px-4 py-5 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-sm font-semibold text-gray-700">Manage All Users , Total Count: {users?.length || "N/A"}</h2>
+      <div className="w-[70%] bg-white shadow-md px-4 py-5 rounded-t-lg flex items-center justify-between">
+        {/* Total Count Text */}
+        <h2 className="text-sm font-semibold text-gray-700">
+          Manage All Users, Total Count: {filteredUsers?.length || "0"}
+        </h2>
+
+        {/* Search Bar */}
+        <input
+          type="text"
+          placeholder="Search by Mobile Number..."
+          className="w-1/4 p-2 px-8 border-2 shadow-sm rounded-md focus:outline-none "
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        {/* Back Button */}
         <Link to="/admin">
           <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
             Back to Account
@@ -86,12 +118,12 @@ const ManageUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {users.length > 0 ? (
-              users.map((user) => (
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
                 <tr key={user._id} className="border-b hover:bg-gray-100">
                   <td className="py-2 px-2">{user.accountType}</td>
                   <td className="py-2 px-2 flex space-x-2">
-                    <button onClick={()=>handleTransactionView(user.accountType,user.mobile)}
+                    <button onClick={() => handleTransactionView(user.accountType, user.mobile)}
                       className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition"
                     >
                       Transactions
