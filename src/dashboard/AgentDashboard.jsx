@@ -134,7 +134,7 @@ const AgentDashboard = () => {
             )}
 
             {
-              profileData?.approval==="verified" &&(
+              profileData?.approval==="verified" && profileData?.status==="active" &&(
                 <button disabled={profileData?.balanceRequest}
               onClick={()=>handleRecharge(profileData?.balanceRequest)}
               className="px-3 py-1 text-xs rounded-md bg-purple-600 text-white font-medium hover:opacity-80 transition"
@@ -145,6 +145,9 @@ const AgentDashboard = () => {
               }
             </button>
               )
+            }
+            {
+              profileData?.status==="block" && <button disabled className="bg-red-100 text-red-600 border border-red-400 px-3 py-1 rounded-md text-xs font-semibold text-center">❌ Blocked Account</button>
             }
 
             <Link
@@ -226,7 +229,7 @@ const AgentDashboard = () => {
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
                 required
               />
-              <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+              <button disabled={profileData?.status==="block"||profileData?.approval!=="verified"} type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
                 {type === "sendMoney" ? "Send Money" : "Cash In"}
               </button>
             </form>

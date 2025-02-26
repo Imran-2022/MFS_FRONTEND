@@ -106,6 +106,9 @@ const UserDashboard = () => {
         <div className="flex justify-between items-center w-full mb-3">
           <h2 className="text-base font-medium">User Account Details</h2>
           <div className="flex gap-2">
+          {
+              profileData?.status==="block" && <button disabled className="bg-red-100 text-red-600 border border-red-400 px-3 py-1 rounded-md text-xs font-semibold text-center">❌ Blocked Account</button>
+            }
             <Link
               to={`/user/${user?.user?.mobile}`}
               className="px-3 py-1 text-xs rounded-md bg-blue-500 text-white font-medium hover:opacity-80 transition"
@@ -181,7 +184,7 @@ const UserDashboard = () => {
                 className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
                 required
               />
-              <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
+              <button disabled={profileData?.status==="block"} type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
                 {type === "sendMoney" ? "Send Money" : "Cash Out"}
               </button>
             </form>
