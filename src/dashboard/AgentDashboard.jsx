@@ -38,8 +38,7 @@ const AgentDashboard = () => {
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
-    console.log(`${type} transaction:`, formData[type]);
-    setFormData({ ...formData, [type]: { receiver: "", amount: "",pin:"" } });
+    // console.log(`${type} transaction:`, formData[type]);
 
     // handle send money and cash out logic. 
 
@@ -51,20 +50,22 @@ const AgentDashboard = () => {
         pin : formData[type].pin,
         type: "Cash In"
       };
-      const handlecashIn = async () => {
+      const handlecashIn = async (e) => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
           const res = await cashIn(transactionData);
-          // console.log("User Profile Data ", res);
-          toast.success("Cash In Success!!");
+          const {amount,receiver,transactionId,type} = res;
+          
+          toast.success( `${type} $${amount} to ${receiver} successful. ! TrxID : ${transactionId}`);
           setRefresh(!refresh);
+          setFormData({ ...formData, [e]: { receiver: "", amount: "",pin:"" } });
         } catch (error) {
           // console.error("Error:", error.response?.data || error.message);
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
-      handlecashIn();
+      handlecashIn(type);
     }
 
 
@@ -79,18 +80,22 @@ const AgentDashboard = () => {
       };
 
       // console.log(transactionData, "transactionData");
-      const handleCSendMoney = async () => {
+      const handleCSendMoney = async (e) => {
         if (!user?.user?.mobile) return; // Ensure user is available before making the request
         try {
           const res = await sendMoney(transactionData);
-          toast.success("Send Money Success!!");
+          // console.log("sendMoney Response",res)
+          const {amount,receiver,transactionId,type} = res;
+          
+          toast.success( `${type} $${amount} to ${receiver} successful. ! TrxID : ${transactionId}`);
           setRefresh(!refresh);
+          setFormData({ ...formData, [e]: { receiver: "", amount: "",pin:"" } });
         } catch (error) {
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
-      handleCSendMoney();
+      handleCSendMoney(type);
     }
 
   };

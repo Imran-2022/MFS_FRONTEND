@@ -40,8 +40,8 @@ const AgentsAccountApproval = () => {
 
       try {
         const res = await cashIn(transactionData);
-        console.log("User Profile Data ", res);
-        toast.success("Balance Recharged!!");
+        const {amount,receiver,transactionId,type} = res;
+        toast.success( `Balance Recharge $${amount} to Agent(${receiver}) successful. ! TrxID : ${transactionId}`);
         setRefresh(!refresh);
       } catch (error) {
         // console.error("Error:", error.response?.data || error.message);

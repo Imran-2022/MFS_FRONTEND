@@ -37,8 +37,6 @@ const UserDashboard = () => {
 
   const handleSubmit = (e, type) => {
     e.preventDefault();
-    setFormData({ ...formData, [type]: { receiver: "", amount: "",pin:"" } });
-
     // handle send money and cash out logic. 
 
     if (type == "cashOut") {
@@ -53,20 +51,22 @@ const UserDashboard = () => {
 
       // console.log(transactionData,"cashout")
 
-      const handleCashOut = async () => {
+      const handleCashOut = async (e) => {
         if (!user?.user?.mobile) return; // Ensure user is available
         try {
           const res = await cashOut(transactionData);
-          // console.log("User Profile Data ", res);
-          toast.success("Cash Out Success!!");
+          console.log("User Profile Data ", res);
+          const {amount,receiver,transactionId,type} = res;
+          toast.success( `${type} $${amount} to ${receiver} successful. ! TrxID : ${transactionId}`);
           setRefresh(!refresh);
+          setFormData({ ...formData, [e]: { receiver: "", amount: "",pin:"" } });
         } catch (error) {
           // console.error("Error:", error.response?.data || error.message);
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
 
-      handleCashOut();
+      handleCashOut(type);
     }
 
 
@@ -82,19 +82,21 @@ const UserDashboard = () => {
 
       // console.log(transactionData, "sendMoney");
 
-      const handleCSendMoney = async () => {
+      const handleCSendMoney = async (e) => {
         if (!user?.user?.mobile) return; // Ensure user is available
         try {
           const res = await sendMoney(transactionData);
           // console.log("User Profile Data ", res);
-          toast.success("Send Money Success!!");
+          const {amount,receiver,transactionId,type} = res;
+          toast.success( `${type} $${amount} to ${receiver} successful. ! TrxID : ${transactionId}`);
           setRefresh(!refresh);
+          setFormData({ ...formData, [e]: { receiver: "", amount: "",pin:"" } });
         } catch (error) {
           // console.error("Error:", error.response?.data || error.message);
           toast.error(error.response?.data?.error || "Something went wrong!");
         }
       };
-      handleCSendMoney();
+      handleCSendMoney(type);
     }
 
   };

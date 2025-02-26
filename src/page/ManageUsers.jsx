@@ -154,7 +154,7 @@ const ManageUsers = () => {
             ) : (
               <tr>
                 <td colSpan="7" className="text-center py-2 text-gray-500">
-                  No Recharge Request found
+                No Data found
                 </td>
               </tr>
             )}
