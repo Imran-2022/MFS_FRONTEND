@@ -7,7 +7,6 @@ const ProtectAgentRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (user?.user) {
       setLoading(false); // Stop loading once user state is available

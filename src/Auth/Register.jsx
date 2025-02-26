@@ -22,7 +22,7 @@ const Register = () => {
         e.preventDefault();
         const { name, pin, mobile, email, accountType, nid } = inputs;
 
-        console.log("input",inputs);
+        // console.log("input",inputs);
 
         if (pin.length !== 5 || isNaN(pin)) {
             toast.error("PIN must be exactly 5 digits");
@@ -39,7 +39,7 @@ const Register = () => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log("register",data);
+                // console.log("register",data);
                 if (data?.error) {
                     toast.error(data.error);
                 } else {
@@ -49,7 +49,7 @@ const Register = () => {
             })
             .catch(error => {
                 console.error('Error:', error);
-                toast.error("Registration failed. Please try again.");
+                toast.error(error.response?.data?.error || "Something went wrong!");
             });
     };
 

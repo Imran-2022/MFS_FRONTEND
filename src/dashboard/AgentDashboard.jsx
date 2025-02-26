@@ -26,7 +26,7 @@ const AgentDashboard = () => {
       if (!user?.user?.mobile) return; // Ensure user is available before making the request
       try {
         const profile = await getUserProfile(user?.user?.mobile);
-        console.log("User Profile Data ", profile);
+        // console.log("User Profile Data ", profile);
         setProfileData(profile);
       } catch (error) {
         console.error("Error fetching profile:", error);

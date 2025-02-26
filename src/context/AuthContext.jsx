@@ -23,19 +23,23 @@ export const AuthProvider = ({ children }) => {
         })
             .then(res => res.json())
             .then(data => {
-                setUser(data);
-                localStorage.setItem("user", JSON.stringify(data));
-                if (data.user.accountType=="User") {
-                    navigate(`/user`);
-                }
-                else if (data.user.accountType=='Agent'){
-                    navigate('/agent');
-                }else if(data.user.accountType=="Admin"){
-                    navigate('/admin');
+                if(data?.error){
+                    console.log(data?.erorr)
+                }else{
+                    setUser(data);
+                    localStorage.setItem("user", JSON.stringify(data));
+                    if (data.user.accountType=="User") {
+                        navigate(`/user`);
+                    }
+                    else if (data.user.accountType=='Agent'){
+                        navigate('/agent');
+                    }else if(data.user.accountType=="Admin"){
+                        navigate('/admin');
+                    }
                 }
             })
             .catch(error => {
-                console.error('Error during login:', error);
+                console.log((error.response?.data?.error));
             });
     };
 
