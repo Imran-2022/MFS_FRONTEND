@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
 import { getAgentsBalance, getAgentswithPending, getAgentswithRechargeRequest, getCountOfUsers, getUserProfile, getUsersBalance } from "../api/user";
-import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 import AccountTable from "../components/AccountTable";
 

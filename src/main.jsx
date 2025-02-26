@@ -18,6 +18,9 @@ import AgentsAccountApproval from './page/AgentsAccountApproval';
 import AgentsBalanceRecharge from './page/AgentsBalanceRecharge';
 import ManageUsers from './page/ManageUsers';
 import AdminTransactionPage from './page/AdminTransactionPage';
+import ProtectUserRoute from './context/ProtectUserRoute';
+import ProtectAdminRoute from './context/ProtectAdminRoute';
+import ProtectAgentRoute from './context/ProtectAgentRoute';
 
 const router = createBrowserRouter([
   {
@@ -35,39 +38,39 @@ const router = createBrowserRouter([
       }, 
       {
         path: '/user',
-        element: <UserDashboard/>
+        element:  <ProtectUserRoute><UserDashboard/></ProtectUserRoute>
       }, 
       {
         path: '/user/:mobile',
-        element: <UserTransactionPage/>
+        element: <ProtectUserRoute><UserTransactionPage/></ProtectUserRoute>
       }, 
       {
         path: '/agent/:mobile',
-        element: <AgentTransactionPage/>
+        element: <ProtectAgentRoute><AgentTransactionPage/></ProtectAgentRoute>
       }, 
       {
         path: '/admin/:mobile',
-        element: <AdminTransactionPage/>
+        element: <ProtectAdminRoute><AdminTransactionPage/></ProtectAdminRoute>
       }, 
       {
         path: '/agent',
-        element: <AgentDashboard/>
+        element: <ProtectAgentRoute><AgentDashboard/></ProtectAgentRoute>
       }, 
       {
         path: '/admin',
-        element: <AdminDashboard/>
+        element: <ProtectAdminRoute><AdminDashboard/></ProtectAdminRoute>
       }, 
       {
         path: '/manage/agents_account',
-        element: <AgentsAccountApproval/>
+        element: <ProtectAdminRoute><AgentsAccountApproval/></ProtectAdminRoute>
       }, 
       {
         path: '/manage/manage_user',
-        element: <ManageUsers/>
+        element: <ProtectAdminRoute><ManageUsers/></ProtectAdminRoute>
       }, 
       {
         path: '/manage/agents_recharge',
-        element: <AgentsBalanceRecharge/>
+        element: <ProtectAdminRoute><AgentsBalanceRecharge/></ProtectAdminRoute>
       }, 
     ]
   },
