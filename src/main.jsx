@@ -21,6 +21,7 @@ import AdminTransactionPage from './page/AdminTransactionPage';
 import ProtectUserRoute from './context/ProtectUserRoute';
 import ProtectAdminRoute from './context/ProtectAdminRoute';
 import ProtectAgentRoute from './context/ProtectAgentRoute';
+import TransactionPage from './page/TransactionPage';
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: '/manage/manage_user',
         element: <ProtectAdminRoute><ManageUsers/></ProtectAdminRoute>
+      }, 
+      {
+        path: '/manage/:mobile',
+        element: <ProtectAdminRoute><TransactionPage/></ProtectAdminRoute>
       }, 
       {
         path: '/manage/agents_recharge',

@@ -56,7 +56,7 @@ const ManageUsers = () => {
   };
 
   const handleTransactionView = async (type, mobile) => {
-    navigate(`/${type.toLowerCase()}/${mobile}`);
+    navigate(`/manage/${mobile}`);
   }
   // Debounced Search Effect
   useEffect(() => {

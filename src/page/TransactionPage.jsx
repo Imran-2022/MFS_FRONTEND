@@ -1,22 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link,useNavigate } from "react-router-dom";
 import { getUserTransactions } from "../api/transactions";
 import AuthContext from "../context/AuthContext";
 import LoadingPage from "../components/LoadingPage";
 
-const AdminTransactionPage = () => {
+const TransactionPage = () => {
   const [transactions, setTransactions] = useState([]);
   const { mobile } = useParams();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
+//   console.log(mobile,"params-mobile")
+
   useEffect(() => {
     const fetchTransactions = async () => {
       if (user?.user) {
         setLoading(false); // Stop loading once user state is available
-  
-        if (user?.user?.mobile != mobile) {
+
+        if (user?.user?.accountType != "Admin") {
           navigate('/');
         }
       }
@@ -33,19 +35,18 @@ const AdminTransactionPage = () => {
   }, [mobile, user, navigate]);
 
   if (loading) {
-    return <LoadingPage/>;
+    return <LoadingPage />;
   }
-
   return (
     <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center p-4">
       {/* Header Section */}
       <div className="w-[70%] bg-white shadow-md px-4 py-5 rounded-t-lg flex justify-between items-center">
-        <h2 className="text-sm font-semibold text-gray-700">ALL Transaction Details, total Count: {transactions?.length || "N/A"}</h2>
-        <Link to="/admin">
-          <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
-            Back to Account
-          </button>
-        </Link>
+        <h2 className="text-sm font-semibold text-gray-700">Transaction Details for {mobile}, total Count: {transactions?.length || "N/A"}</h2>
+        <Link to="/manage/manage_user">
+            <button className="px-3 py-1 text-xs rounded-md bg-red-500 text-white font-medium hover:opacity-80 transition">
+              Back to Admin/Management
+            </button>
+          </Link>
       </div>
 
       {/* Transactions Table */}
@@ -85,4 +86,7 @@ const AdminTransactionPage = () => {
   );
 };
 
-export default AdminTransactionPage;
+export default TransactionPage;
+
+
+

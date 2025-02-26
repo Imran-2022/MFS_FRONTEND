@@ -1,19 +1,28 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from './AuthContext';
 import { useNavigate } from 'react-router-dom';
+import LoadingPage from '../components/LoadingPage';
 
-const ProtectAdminRoute = ({children}) => {
+const ProtectAdminRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  
-  if(user?.user?.accountType!=="Admin"){
-    navigate('/');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.user) {
+      setLoading(false); // Stop loading once user state is available
+
+      if (user?.user?.accountType !== "Admin") {
+        navigate('/');
+      }
+    }
+  }, [user, navigate]);
+
+  if (loading) {
+    return <LoadingPage/>;
   }
-  return (
-    <div>
-      {children}
-    </div>
-  )
-}
+
+  return <>{children}</>;
+};
 
 export default ProtectAdminRoute;
