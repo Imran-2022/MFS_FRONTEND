@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAuthToken } from "../token/getToken";
 const API_URL = import.meta.env.VITE_ENDPOINT;
 
 // Get User Profile
@@ -12,8 +13,7 @@ export const getUserProfile = async (mobile) => {
 //  Get Agents account pending 
 
 export const getAgentswithPending = async () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const token = storedUser?.token;
+  const token = getAuthToken();
 
   try {
     const response = await axios.get(`${API_URL}/user/agentspending`, {
@@ -31,8 +31,7 @@ export const getAgentswithPending = async () => {
 //  Get Agents Balance Recharge
 
 export const getAgentswithRechargeRequest = async () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+  const token = getAuthToken();
   
     try {
       const response = await axios.get(`${API_URL}/user/agentsRescharge`, {
@@ -62,8 +61,7 @@ export const getCountOfUsers = async () => {
 //  update Aegnts account Status
 
 export const updateAgentAccountStatus = async (mobile, approval) => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+  const token = getAuthToken();
     // console.log("token",token);
     try {
         const response = await axios.patch(

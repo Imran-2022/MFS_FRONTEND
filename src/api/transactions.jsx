@@ -1,23 +1,46 @@
 import axios from "axios";
+import { getAuthToken } from "../token/getToken";
 const API_URL = import.meta.env.VITE_ENDPOINT;
 
 // Cash-Out
 export const cashOut = async (transactionData) => {
-    const response = await axios.post(`${API_URL}/transaction`, transactionData);
+  const token = getAuthToken();
+
+  try {
+    const response = await axios.post(`${API_URL}/transaction`, transactionData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
+  } catch (error) {
+    console.error("Error processing cash out:", error);
+    throw error;
+  }
 };
 
 // Send-Money
 export const sendMoney = async (transactionData) => {
-    const response = await axios.post(`${API_URL}/transaction`, transactionData);
+  const token = getAuthToken();
+
+  try {
+    const response = await axios.post(`${API_URL}/transaction`, transactionData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
+  } catch (error) {
+    console.error("Error sending money:", error);
+    throw error;
+  }
 };
+
 
 // cash-In 
 
 export const cashIn = async (transactionData) => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const token = storedUser?.token;
+  const token = getAuthToken();
 
     try {
         const response = await axios.post(`${API_URL}/transaction`, transactionData, {
