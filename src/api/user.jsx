@@ -22,6 +22,18 @@ export const getAgentswithRechargeRequest = async () => {
     const response = await axios.get(`${API_URL}/user/agentsRescharge`);
     return response.data;
 };
+//  Get All users
+
+export const getAllUsers = async () => {
+    const response = await axios.get(`${API_URL}/user/`);
+    return response.data;
+};
+//  Get Count of Users
+
+export const getCountOfUsers = async () => {
+    const response = await axios.get(`${API_URL}/user/count`);
+    return response?.data.totalUsers;
+};
 
 //  update Aegnts account Status
 

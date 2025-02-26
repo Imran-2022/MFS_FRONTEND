@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthContext";
-import { getAgentsBalance, getAgentswithPending, getAgentswithRechargeRequest, getUserProfile, getUsersBalance } from "../api/user";
+import { getAgentsBalance, getAgentswithPending, getAgentswithRechargeRequest, getCountOfUsers, getUserProfile, getUsersBalance } from "../api/user";
 import { cashIn, sendMoney } from "../api/transactions";
 import { Link } from "react-router-dom";
 import AccountTable from "../components/AccountTable";
@@ -33,54 +33,11 @@ const AdminDashboard = () => {
     fetchProfile();
   }, [user]); // Dependency array includes `user` to refetch when it changes
 
-  const handleSubmit = (e, type) => {
-    e.preventDefault();
-    console.log(`${type} transaction:`, formData[type]);
-    setFormData({ ...formData, [type]: { receiver: "", amount: "" } });
-
-    // handle send money and cash out logic. 
-
-    if (type == "cashIn") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Cash In", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
-      const handlecashIn = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
-        try {
-          const res = await cashIn(transactionData);
-          console.log("User Profile Data ", res);
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        }
-      };
-
-      handlecashIn();
-    }
-
-
-    if (type == "sendMoney") {
-      const transactionData = { sender: user?.user?.mobile, ...formData[type], type: "Send Money", amount: Number(formData[type].amount) };
-      console.log(transactionData, "transactionData");
-      const handleCSendMoney = async () => {
-        if (!user?.user?.mobile) return; // Ensure user is available before making the request
-        try {
-          const res = await sendMoney(transactionData);
-          console.log("User Profile Data ", res);
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        }
-      };
-
-      handleCSendMoney();
-    }
-
-  };
-
-
-
 
   // pending agent size, 
 
   const [agents, setAgents] = useState([]);
+  const [countUser, setCountUser] = useState([]);
   const [balanceRequest, setBalanceRequest] = useState([]);
 
   useEffect(() => {
@@ -100,6 +57,18 @@ const AdminDashboard = () => {
       try {
         const res = await getAgentswithRechargeRequest();
         setBalanceRequest(res);
+      } catch (error) {
+        console.error("Error fetching agents:", error);
+      }
+    };
+
+    fetchAgents();
+  }, []);
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const res = await getCountOfUsers();
+        setCountUser(res);
       } catch (error) {
         console.error("Error fetching agents:", error);
       }
@@ -176,41 +145,14 @@ const AdminDashboard = () => {
 
       {/* Total Balance of the Entire System */}
 
-      <div className="w-full max-w-4xl mt-4 rounded-xl shadow  p-4">
-        <h2 className="text-base font-medium">Total Balance in the System</h2>
-        <AccountTable accounts={accounts} />
-      </div>
+     
 
       {/* Transaction Forms */}
       <div className="w-full max-w-4xl mt-4 flex gap-4">
-        {["sendMoney"].map((type, index) => (
-          <div key={type} className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
-            <h2 className="text-sm font-semibold text-center">{type === "sendMoney" ? "Send Money" : "Cash In"}</h2>
-            <form className="mt-2 space-y-2" onSubmit={(e) => handleSubmit(e, type)}>
-              <input
-                type="text"
-                name="receiver"
-                placeholder="Receiver Phone"
-                value={formData[type].receiver}
-                onChange={(e) => handleChange(e, type)}
-                className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
-                required
-              />
-              <input
-                type="number"
-                name="amount"
-                placeholder="Amount"
-                value={formData[type].amount}
-                onChange={(e) => handleChange(e, type)}
-                className="w-full p-2 border rounded-lg focus:ring-0 focus:outline-none"
-                required
-              />
-              <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-sm font-semibold hover:opacity-90 transition">
-                {type === "sendMoney" ? "Send Money" : "Cash In"}
-              </button>
-            </form>
-          </div>
-        ))}
+      <div className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
+        <h2 className="text-sm font-semibold text-center mb-2">Total Balance in the System</h2>
+        <AccountTable accounts={accounts} />
+      </div>
 
         <div className="w-1/2 p-4 rounded-xl shadow text-gray-900 border bg-white">
           <h2 className="text-sm font-semibold text-center mb-2">Handle Admin Task</h2>
@@ -253,9 +195,9 @@ const AdminDashboard = () => {
               </tr>
               <tr className="border-b">
                 <td className="p-1 text-left text-sm">Manage Users of the System</td>
-                <td className="p-1 text-center text-blue-600 font-bold text-xs">50</td>
+                <td className="p-1 text-center text-blue-600 font-bold text-xs">{countUser}</td>
                 <td className="p-1 text-right">
-                  <Link to="/manage/agents_withdraw">
+                  <Link to="/manage/manage_user">
                     <button
                       className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg text-xs font-semibold hover:opacity-90 transition px-3 py-1"
                     >
